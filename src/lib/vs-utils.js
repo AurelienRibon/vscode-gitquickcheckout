@@ -8,5 +8,5 @@ exports.getWorkspaceFoldersPaths = function () {
 };
 
 exports.getConfiguration = function () {
-  return vscode.workspace.getConfiguration('com.aurelienribon.gitquickcheckout');
+  return vscode.workspace.getConfiguration('gitquickcheckout');
 };

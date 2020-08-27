@@ -4,7 +4,7 @@ const vscode = require('vscode');
 const vsUtils = require('./lib/vs-utils');
 const gitUtils = require('./lib/git-utils');
 
-exports.commandId = 'com.aurelienribon.gitquickcheckout.checkoutAll';
+exports.commandId = 'gitquickcheckout.checkoutAll';
 
 exports.execute = async function () {
   const folderPaths = vsUtils.getWorkspaceFoldersPaths();

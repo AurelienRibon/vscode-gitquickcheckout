@@ -1,5 +1,5 @@
 {
-  "name": "com.aurelienribon.gitquickcheckout",
+  "name": "gitquickcheckout",
   "version": "1.0.0",
   "displayName": "Git Quick Checkout",
   "description": "Quickly checkout all workspace folders to any branch. Autocompletion will provide a list of all branches available in the whole workspace, for fast switching.",
@@ -17,12 +17,12 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:com.aurelienribon.gitquickcheckout.checkoutAll"
+    "onCommand:gitquickcheckout.checkoutAll"
   ],
   "contributes": {
     "commands": [
       {
-        "command": "com.aurelienribon.gitquickcheckout.checkoutAll",
+        "command": "gitquickcheckout.checkoutAll",
         "title": "GitQuickCheckout: Switch all workspaces folders to another branch..."
       }
     ],
