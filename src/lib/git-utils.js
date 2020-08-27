@@ -23,9 +23,10 @@ async function checkoutFolderBranch(path, branchName) {
   }
 
   if (!(await isBranchAvailableInFolder(path, branchName))) {
-    const { defaultBranchName } = vsUtils.getConfiguration();
+    const defaultBranchName = vsUtils.getConfiguration().defaultBranchName || 'master';
+
     if (branchName !== defaultBranchName) {
-      return checkoutFolderBranch(path, 'master');
+      return checkoutFolderBranch(path, defaultBranchName);
     } else {
       return;
     }
