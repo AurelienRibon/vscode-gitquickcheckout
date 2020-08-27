@@ -9,7 +9,7 @@ exports.commandId = 'gitquickcheckout.checkoutAll';
 exports.execute = async function () {
   const folderPaths = vsUtils.getWorkspaceFoldersPaths();
   if (!folderPaths) {
-    vscode.window.showInformationMessage('Sorry, workspace has no folder(s) to checkout.');
+    vsUtils.showBriefStatusBarMessage('Sorry, workspace has no folder(s) to checkout.');
   }
 
   const possibleBranchNames = await gitUtils.listBranchNames(folderPaths);
@@ -22,4 +22,6 @@ exports.execute = async function () {
   }
 
   await gitUtils.checkoutBranch(folderPaths, selectedBranchName);
+
+  vsUtils.showBriefStatusBarMessage(`Workspace folders switched to ${selectedBranchName}.`);
 };

@@ -10,3 +10,7 @@ exports.getWorkspaceFoldersPaths = function () {
 exports.getConfiguration = function () {
   return vscode.workspace.getConfiguration('gitquickcheckout');
 };
+
+exports.showBriefStatusBarMessage = function (msg) {
+  vscode.window.setStatusBarMessage(msg, 2000);
+};
