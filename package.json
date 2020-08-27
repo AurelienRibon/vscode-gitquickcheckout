@@ -1,6 +1,6 @@
 {
   "name": "gitquickcheckout",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "license": "MIT",
   "author": "Aurelien Ribon <aurelien.ribon@gmail.com> (http://www.aurelienribon.com)",
   "main": "./src/extension.js",
