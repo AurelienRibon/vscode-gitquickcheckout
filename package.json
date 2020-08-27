@@ -1,0 +1,49 @@
+{
+  "name": "com.aurelienribon.gitquickcheckout",
+  "version": "1.0.0",
+  "displayName": "Git Quick Checkout",
+  "description": "Quickly checkout all workspace folders to any branch. Autocompletion will provide a list of all branches available in the whole workspace, for fast switching.",
+  "keywords": [
+    "git",
+    "checkout",
+    "productivity"
+  ],
+  "license": "MIT",
+  "main": "./src/extension.js",
+  "engines": {
+    "vscode": "^1.48.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onCommand:com.aurelienribon.gitquickcheckout.checkoutAll"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "com.aurelienribon.gitquickcheckout.checkoutAll",
+        "title": "GitQuickCheckout: Switch all workspaces folders to another branch..."
+      }
+    ],
+    "configuration": {
+      "title": "Git Quick Checkout",
+      "properties": {
+        "gitquickcheckout.defaultBranchName": {
+          "type": "string",
+          "default": "master",
+          "description": "Default branch to checkout in all folders for which selected branch is not available."
+        }
+      }
+    }
+  },
+  "dependencies": {
+    "simple-git": "^2.20.1"
+  },
+  "devDependencies": {
+    "@types/node": "^14.0.27",
+    "@types/vscode": "^1.48.0",
+    "eslint": "^7.6.0",
+    "prettier": "^2.1.1"
+  }
+}
