@@ -1,4 +1,6 @@
 /.vscode
+/docs
+
 /.eslintrc.json
 /.gitignore
 /.prettierrc
