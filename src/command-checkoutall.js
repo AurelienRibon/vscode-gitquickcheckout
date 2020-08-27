@@ -17,11 +17,8 @@ exports.execute = async function () {
     placeHolder: 'Choose the branch to checkout in all worspace folders',
   });
 
-  if (!selectedBranchName) {
-    return;
+  if (selectedBranchName) {
+    await gitUtils.checkoutBranch(folderPaths, selectedBranchName);
+    vsUtils.showBriefStatusBarMessage(`Workspace folders switched to ${selectedBranchName}.`);
   }
-
-  await gitUtils.checkoutBranch(folderPaths, selectedBranchName);
-
-  vsUtils.showBriefStatusBarMessage(`Workspace folders switched to ${selectedBranchName}.`);
 };
