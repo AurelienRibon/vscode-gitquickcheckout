@@ -12,5 +12,5 @@ exports.getConfiguration = function () {
 };
 
 exports.showBriefStatusBarMessage = function (msg) {
-  vscode.window.setStatusBarMessage(msg, 2000);
+  vscode.window.setStatusBarMessage(msg, 3000);
 };
