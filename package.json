@@ -1,24 +1,28 @@
 {
   "name": "gitquickcheckout",
   "version": "1.0.0",
+  "license": "MIT",
+  "author": "Aurelien Ribon <aurelien.ribon@gmail.com> (http://www.aurelienribon.com)",
+  "main": "./src/extension.js",
   "displayName": "Git Quick Checkout",
   "description": "Quickly checkout all workspace folders to any branch. Autocompletion will provide a list of all branches available in the whole workspace, for fast switching.",
-  "repository": { "type": "git", "url": "https://github.com/AurelienRibon/vscode-gitquickcheckout" },
-  "author": "Aurelien Ribon <aurelien.ribon@gmail.com> (http://www.aurelienribon.com)",
+  "icon": "docs/icon.png",
   "publisher": "AurelienRibon",
+  "categories": [
+    "Other"
+  ],
   "keywords": [
     "git",
     "checkout",
     "productivity"
   ],
-  "license": "MIT",
-  "main": "./src/extension.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AurelienRibon/vscode-gitquickcheckout"
+  },
   "engines": {
     "vscode": "^1.48.0"
   },
-  "categories": [
-    "Other"
-  ],
   "activationEvents": [
     "onCommand:gitquickcheckout.checkoutAll"
   ],
