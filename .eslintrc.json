@@ -1,11 +1,18 @@
 {
-  "extends": "eslint:recommended",
+  "root": true,
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended",
+    "prettier",
+    "prettier/@typescript-eslint"
+  ],
   "env": {
     "es6": true,
     "node": true,
     "mocha": true
   },
+  "parser": "@typescript-eslint/parser",
   "parserOptions": {
-    "ecmaVersion": 2018
+    "ecmaVersion": 2020
   }
 }
