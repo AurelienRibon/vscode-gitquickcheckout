@@ -13,13 +13,13 @@ async function execute(): Promise<void> {
     return;
   }
 
-  const possibleBranchNames = await gitUtils.listBranchNames(folderPaths);
-  const selectedBranchName = await vscode.window.showQuickPick(possibleBranchNames, {
+  const gitContext = await gitUtils.listBranchNames(folderPaths);
+  const selectedBranchName = await vscode.window.showQuickPick(gitContext.branchNames, {
     placeHolder: 'Choose the branch to checkout in all worspace folders',
   });
 
   if (selectedBranchName) {
-    await gitUtils.checkoutBranch(folderPaths, selectedBranchName);
+    await gitUtils.checkoutBranch(selectedBranchName, gitContext);
     vsUtils.showBriefStatusBarMessage(`Workspace folders switched to ${selectedBranchName}.`);
   }
 }
