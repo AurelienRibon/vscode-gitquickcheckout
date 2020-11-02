@@ -3,7 +3,7 @@
   "version": "1.2.1",
   "license": "MIT",
   "author": "Aurelien Ribon <aurelien.ribon@gmail.com> (http://www.aurelienribon.com)",
-  "main": "./src/extension.js",
+  "main": "./out/src/extension.js",
   "displayName": "Git Quick Checkout",
   "description": "Quickly checkout all workspace folders to any branch. Autocompletion will provide a list of all branches available in the whole workspace, for fast switching.",
   "icon": "docs/icon.png",
@@ -44,13 +44,19 @@
       }
     }
   },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc"
+  },
   "dependencies": {
     "simple-git": "^2.20.1"
+    "simple-git": "^2.21.0"
   },
   "devDependencies": {
-    "@types/node": "^14.0.27",
-    "@types/vscode": "^1.48.0",
-    "eslint": "^7.6.0",
-    "prettier": "^2.1.1"
+    "@types/node": "^14.14.6",
+    "@types/vscode": "^1.50.0",
+    "eslint": "^7.12.1",
+    "prettier": "^2.1.2",
+    "typescript": "^4.0.5"
   }
 }

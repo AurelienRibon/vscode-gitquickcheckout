@@ -1,15 +1,16 @@
 'use strict';
 
-const vscode = require('vscode');
-const vsUtils = require('./lib/vs-utils');
-const gitUtils = require('./lib/git-utils');
+import * as vscode from 'vscode';
+import * as vsUtils from './lib/vs-utils';
+import * as gitUtils from './lib/git-utils';
 
-exports.commandId = 'gitquickcheckout.checkoutAll';
+export default { commandId: 'gitquickcheckout.checkoutAll', execute };
 
-exports.execute = async function () {
+async function execute(): Promise<void> {
   const folderPaths = vsUtils.getWorkspaceFoldersPaths();
   if (!folderPaths) {
     vsUtils.showBriefStatusBarMessage('Sorry, workspace has no folder(s) to checkout.');
+    return;
   }
 
   const possibleBranchNames = await gitUtils.listBranchNames(folderPaths);
@@ -21,4 +22,4 @@ exports.execute = async function () {
     await gitUtils.checkoutBranch(folderPaths, selectedBranchName);
     vsUtils.showBriefStatusBarMessage(`Workspace folders switched to ${selectedBranchName}.`);
   }
-};
+}

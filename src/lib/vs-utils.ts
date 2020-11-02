@@ -1,16 +1,16 @@
 'use strict';
 
-const vscode = require('vscode');
+import * as vscode from 'vscode';
 
-exports.getWorkspaceFoldersPaths = function () {
+export function getWorkspaceFoldersPaths(): string[] | undefined {
   const folders = vscode.workspace.workspaceFolders;
   return folders && folders.map((it) => it.uri.fsPath);
-};
+}
 
-exports.getConfiguration = function () {
+export function getConfiguration(): vscode.WorkspaceConfiguration {
   return vscode.workspace.getConfiguration('gitquickcheckout');
-};
+}
 
-exports.showBriefStatusBarMessage = function (msg) {
+export function showBriefStatusBarMessage(msg: string): void {
   vscode.window.setStatusBarMessage(msg, 3000);
-};
+}

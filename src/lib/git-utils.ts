@@ -1,35 +1,33 @@
 'use strict';
 
-const simpleGit = require('simple-git');
-const vsUtils = require('./vs-utils');
+import simpleGit, { CheckRepoActions } from 'simple-git';
+import * as vsUtils from './vs-utils';
 
-exports.listBranchNames = async function (paths) {
+export async function listBranchNames(paths: string[]): Promise<string[]> {
   const results = await parallelize(paths, listFolderBranchNames);
   const uniqueBranchNames = new Set(results.flat());
   return Array.from(uniqueBranchNames).sort();
-};
+}
 
-exports.checkoutBranch = async function (paths, branchName) {
-  return parallelize(paths, (path) => checkoutFolderBranch(path, branchName));
-};
+export async function checkoutBranch(paths: string[], branchName: string): Promise<void> {
+  await parallelize(paths, (path) => checkoutFolderBranch(path, branchName));
+}
 
 // -----------------------------------------------------------------------------
 // GIT HELPERS
 // -----------------------------------------------------------------------------
 
-async function checkoutFolderBranch(path, branchName) {
+async function checkoutFolderBranch(path: string, branchName: string): Promise<void> {
   if (!(await isFolderAGitRoot(path))) {
     return;
   }
 
   if (!(await isBranchAvailableInFolder(path, branchName))) {
-    const defaultBranchName = vsUtils.getConfiguration().defaultBranchName || 'master';
-
+    const defaultBranchName = vsUtils.getConfiguration().defaultBranchName as string || 'master';
     if (branchName !== defaultBranchName) {
-      return checkoutFolderBranch(path, defaultBranchName);
-    } else {
-      return;
+      await checkoutFolderBranch(path, defaultBranchName);
     }
+    return;
   }
 
   try {
@@ -39,7 +37,7 @@ async function checkoutFolderBranch(path, branchName) {
   }
 }
 
-async function listFolderBranchNames(path) {
+async function listFolderBranchNames(path: string): Promise<string[]> {
   if (!(await isFolderAGitRoot(path))) {
     return [];
   }
@@ -53,7 +51,7 @@ async function listFolderBranchNames(path) {
     return [];
   }
 
-  const branchNames = [];
+  const branchNames: string[] = [];
   for (const branchName of res.all) {
     if (branchName.startsWith('remotes/origin/')) {
       branchNames.push(branchName.slice('remotes/origin/'.length));
@@ -65,16 +63,16 @@ async function listFolderBranchNames(path) {
   return branchNames;
 }
 
-async function isFolderAGitRoot(path) {
+async function isFolderAGitRoot(path: string): Promise<boolean> {
   try {
-    return simpleGit().cwd(path).checkIsRepo('root');
+    return simpleGit().cwd(path).checkIsRepo(CheckRepoActions.IS_REPO_ROOT);
   } catch (err) {
     console.error(`Failed to check if folder ${path} is a git repo. ${err.nessage}`);
     return false;
   }
 }
 
-async function isBranchAvailableInFolder(path, branchName) {
+async function isBranchAvailableInFolder(path: string, branchName: string): Promise<boolean> {
   try {
     const res = await simpleGit().cwd(path).branch(['--list', branchName]);
     return res.all.length > 0;
@@ -88,7 +86,7 @@ async function isBranchAvailableInFolder(path, branchName) {
 // MISC HELPERS
 // -----------------------------------------------------------------------------
 
-async function parallelize(paths, fn) {
+async function parallelize<T>(paths: string[], fn: (path: string) => Promise<T>): Promise<T[]> {
   const promises = paths.map(fn);
   return Promise.all(promises);
 }
