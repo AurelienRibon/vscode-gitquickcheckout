@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.3.0] - 2020-11-02
+### Added
+- Converted the project to Typescript
+### Fixed
+- Fix checkout of remote branches when they were never checked-out locally.
+
 ## [1.2.1] - 2020-08-27
 ### Fixed
 - Fix config param `defaultBranchName` not taken into account.
