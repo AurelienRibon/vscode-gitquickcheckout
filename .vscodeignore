@@ -1,9 +1,11 @@
-/.vscode
-/docs
-/src
+.vscode
+docs
+src
 
-/.eslintrc.json
-/.gitignore
-/.prettierrc
-/.vscodeignore
-/README.md
+.eslintignore
+.eslintrc.json
+.gitignore
+.prettierrc
+.vscodeignore
+package-lock.json
+tsconfig.json
