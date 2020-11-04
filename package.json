@@ -6,7 +6,7 @@
   "main": "./out/src/extension.js",
   "displayName": "Git Quick Checkout",
   "description": "Quickly checkout all workspace folders to any branch. Autocompletion will provide a list of all branches available in the whole workspace, for fast switching.",
-  "icon": "docs/icon.png",
+  "icon": "res/icon.png",
   "publisher": "AurelienRibon",
   "categories": [
     "Other"
