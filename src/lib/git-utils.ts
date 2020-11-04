@@ -4,9 +4,9 @@ import * as vscode from 'vscode';
 import * as vsUtils from './vs-utils';
 import { GitExtension, Ref, RefType, Repository } from '../types/git';
 
-type RefMap = Map<string, Repository[]>;
+type RefMap = Map<string, Set<Repository>>;
 
-interface GitContext {
+export interface GitContext {
   repos: Repository[];
   refNames: string[];
   refNamesMap: RefMap;
@@ -57,7 +57,8 @@ function getRepos(): Repository[] {
 }
 
 function getReposWithRef(refName: string, context: GitContext): Repository[] {
-  return context.refNamesMap.get(refName) || [];
+  const reposSet = context.refNamesMap.get(refName);
+  return reposSet ? Array.from(reposSet) : [];
 }
 
 function getReposWithoutRef(refName: string, context: GitContext): Repository[] {
@@ -79,11 +80,11 @@ function registerRefNames(repo: Repository, map: RefMap): void {
   for (const refName of refNames) {
     let bucket = map.get(refName);
     if (!bucket) {
-      bucket = [];
+      bucket = new Set();
       map.set(refName, bucket);
     }
 
-    bucket.push(repo);
+    bucket.add(repo);
   }
 }
 
