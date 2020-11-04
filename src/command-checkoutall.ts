@@ -7,19 +7,13 @@ import * as gitUtils from './lib/git-utils';
 export default { commandId: 'gitquickcheckout.checkoutAll', execute };
 
 async function execute(): Promise<void> {
-  const folderPaths = vsUtils.getWorkspaceFoldersPaths();
-  if (!folderPaths) {
-    vsUtils.showBriefStatusBarMessage('Sorry, workspace has no folder(s) to checkout.');
-    return;
-  }
-
-  const gitContext = await gitUtils.listBranchNames(folderPaths);
-  const selectedBranchName = await vscode.window.showQuickPick(gitContext.branchNames, {
-    placeHolder: 'Choose the branch to checkout in all worspace folders',
+  const gitContext = gitUtils.listRefNames();
+  const selectedRefName = await vscode.window.showQuickPick(gitContext.refNames, {
+    placeHolder: 'Choose the ref to checkout in all workspace folders',
   });
 
-  if (selectedBranchName) {
-    await gitUtils.checkoutBranch(selectedBranchName, gitContext);
-    vsUtils.showBriefStatusBarMessage(`Workspace folders switched to ${selectedBranchName}.`);
+  if (selectedRefName) {
+    await gitUtils.checkoutRef(selectedRefName, gitContext);
+    vsUtils.showBriefStatusBarMessage(`Workspace folders switched to ${selectedRefName}.`);
   }
 }

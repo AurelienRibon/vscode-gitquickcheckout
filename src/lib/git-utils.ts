@@ -1,94 +1,128 @@
 'use strict';
 
-import simpleGit, { CheckRepoActions } from 'simple-git';
+import * as vscode from 'vscode';
 import * as vsUtils from './vs-utils';
+import { GitExtension, Ref, RefType, Repository } from '../types/git';
+
+type RefMap = Map<string, Ref>;
 
 interface GitContext {
-  paths: string[];
-  branchNames: string[];
-  branchNamesMap: Map<string, string[]>;
+  refNames: string[];
+  refNamesTree: Map<string, RefMap>;
 }
 
-export async function listBranchNames(paths: string[]): Promise<GitContext> {
-  const branchNamesPerRepo = await parallelize(paths, listFolderBranchNames);
-  const uniqueBranchNames = new Set(branchNamesPerRepo.flat());
-
-  return {
-    paths,
-    branchNames: Array.from(uniqueBranchNames).sort(),
-    branchNamesMap: new Map(paths.map((it, i) => [it, branchNamesPerRepo[i]])),
-  };
+export function listRefNames(): GitContext {
+  const repos = getRepos();
+  const refNamesMaps = repos.map(mapRepoRefNames);
+  const refNames = extractUniqueRefNames(refNamesMaps);
+  const refNamesTree = new Map(repos.map(getRepoPath).map((it, i) => [it, refNamesMaps[i]]));
+  return { refNames, refNamesTree };
 }
 
-export async function checkoutBranch(branchName: string, context: GitContext): Promise<void> {
-  await parallelize(context.paths, (path) => checkoutFolderBranch(path, branchName, context));
+export async function checkoutRef(refName: string, context: GitContext): Promise<void> {
+  const repos = getRepos();
+  await parallelize(repos, (repo) => checkoutRepoRef(repo, refName, context));
 }
 
 // -----------------------------------------------------------------------------
-// GIT HELPERS
+// HELPERS: GIT MUTATIONS
 // -----------------------------------------------------------------------------
 
-async function checkoutFolderBranch(path: string, branchName: string, context: GitContext): Promise<void> {
-  if (!isBranchAvailableInFolder(path, branchName, context)) {
-    const defaultBranchName = (vsUtils.getConfiguration().defaultBranchName as string) || 'master';
-    if (branchName !== defaultBranchName) {
-      await checkoutFolderBranch(path, defaultBranchName, context);
+async function checkoutRepoRef(repo: Repository, refName: string, context: GitContext): Promise<void> {
+  const path = getRepoPath(repo);
+  const ref = context.refNamesTree.get(path)?.get(refName);
+  const defaultRefName = getDefaultRefName();
+
+  if (repo.state.HEAD?.name === ref?.name) {
+    return;
+  }
+
+  console.log(repo.rootUri.fsPath, refName, ref);
+
+  if (!ref) {
+    if (refName !== defaultRefName) {
+      await checkoutRepoRef(repo, defaultRefName, context);
     }
     return;
   }
 
   try {
-    await simpleGit().cwd(path).checkout(branchName);
+    await repo.checkout(refName);
   } catch (err) {
-    console.error(`Failed to checkout branch in folder ${path}. ${err.message}`);
+    console.error(`Failed to checkout ref in folder ${path}. ${err.message}`);
   }
 }
 
-async function listFolderBranchNames(path: string): Promise<string[]> {
-  if (!(await isFolderAGitRoot(path))) {
-    return [];
-  }
+// -----------------------------------------------------------------------------
+// HELPERS: GIT ACCESS
+// -----------------------------------------------------------------------------
 
-  let res;
+function getRepos(): Repository[] {
+  const gitExtension = vscode.extensions.getExtension<GitExtension>('vscode.git')?.exports;
+  const api = gitExtension?.getAPI(1);
+  return api ? api.repositories : [];
+}
 
-  try {
-    res = await simpleGit().cwd(path).branch();
-  } catch (err) {
-    console.error(`Failed list branches in folder ${path}. ${err.message}`);
-    return [];
-  }
+function getRepoPath(repo: Repository): string {
+  return repo.rootUri.fsPath;
+}
 
-  const branchNames: string[] = [];
-  for (const branchName of res.all) {
-    if (branchName.startsWith('remotes/origin/')) {
-      branchNames.push(branchName.slice('remotes/origin/'.length));
-    } else if (!branchName.startsWith('remotes/')) {
-      branchNames.push(branchName);
+function getDefaultRefName(): string {
+  return (vsUtils.getConfiguration().defaultBranchName as string) || 'master';
+}
+
+// -----------------------------------------------------------------------------
+// HELPERS: REF MAPPING
+// -----------------------------------------------------------------------------
+
+function mapRepoRefNames(repo: Repository): RefMap {
+  const map: RefMap = new Map();
+
+  for (const ref of repo.state.refs) {
+    const simpleRefName = simplifyRefName(ref);
+
+    // If the ref does not interest us, carry on.
+    if (!simpleRefName) {
+      continue;
     }
+
+    // If we already saw this ref, we let it be overridden if the new ref is a
+    // local one. It's an opinionated choice.
+    if (ref.type !== RefType.Head && map.has(simpleRefName)) {
+      continue;
+    }
+
+    map.set(simpleRefName, ref);
   }
 
-  return branchNames;
+  return map;
 }
 
-async function isFolderAGitRoot(path: string): Promise<boolean> {
-  try {
-    return simpleGit().cwd(path).checkIsRepo(CheckRepoActions.IS_REPO_ROOT);
-  } catch (err) {
-    console.error(`Failed to check if folder ${path} is a git repo. ${err.nessage}`);
-    return false;
+function simplifyRefName(ref: Ref) {
+  if (ref.type === RefType.Head && ref.name) {
+    return ref.name;
+  } else if (ref.type === RefType.RemoteHead && ref.name && ref.remote) {
+    return ref.name?.slice(ref.remote.length + 1);
   }
 }
 
 // -----------------------------------------------------------------------------
-// MISC HELPERS
+// HELPERS: SYSTEM
 // -----------------------------------------------------------------------------
 
-async function parallelize<T>(paths: string[], fn: (path: string) => Promise<T>): Promise<T[]> {
-  const promises = paths.map(fn);
+async function parallelize<T>(repositories: Repository[], fn: (repo: Repository) => Promise<T>): Promise<T[]> {
+  const promises = repositories.map(fn);
   return Promise.all(promises);
 }
 
-function isBranchAvailableInFolder(path: string, branchName: string, context: GitContext): boolean {
-  const branchNames = context.branchNamesMap.get(path);
-  return branchNames ? branchNames.includes(branchName) : false;
+function extractUniqueRefNames(maps: RefMap[]): string[] {
+  const set = new Set<string>();
+
+  for (const map of maps) {
+    for (const key of map.keys()) {
+      set.add(key);
+    }
+  }
+
+  return [...set].sort();
 }
