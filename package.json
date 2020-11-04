@@ -30,7 +30,7 @@
     "commands": [
       {
         "command": "gitquickcheckout.checkoutAll",
-        "title": "Git Quick Checkout: Switch all workspaces folders to another branch..."
+        "title": "Git Quick Checkout: Switch All Workspace Folders To Another Branch..."
       }
     ],
     "configuration": {
