@@ -7,6 +7,7 @@ export function getWorkspaceFoldersPaths(): string[] | undefined {
   return folders && folders.map((it) => it.uri.fsPath);
 }
 
-export function getConfiguration(): vscode.WorkspaceConfiguration {
-  return vscode.workspace.getConfiguration('gitquickcheckout');
+export function getDefaultRefName(): string {
+  const config = vscode.workspace.getConfiguration('gitquickcheckout');
+  return (config.defaultBranchName as string) || 'master';
 }

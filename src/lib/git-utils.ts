@@ -4,6 +4,10 @@ import * as vscode from 'vscode';
 import * as vsUtils from './vs-utils';
 import { GitExtension, Ref, RefType, Repository } from '../types/git';
 
+// -----------------------------------------------------------------------------
+// TYPES
+// -----------------------------------------------------------------------------
+
 type RefMap = Map<string, Set<Repository>>;
 
 export interface GitContext {
@@ -11,6 +15,10 @@ export interface GitContext {
   refNames: string[];
   refNamesMap: RefMap;
 }
+
+// -----------------------------------------------------------------------------
+// API
+// -----------------------------------------------------------------------------
 
 export function listRefNames(): GitContext {
   const repos = getRepos();
@@ -26,7 +34,8 @@ export async function checkoutRef(refName: string, context: GitContext): Promise
   await parallelize(reposWithRef, (repo) => checkoutRepoRef(repo, refName));
 
   const reposWithoutRef = getReposWithoutRef(refName, context);
-  await parallelize(reposWithoutRef, (repo) => checkoutRepoRef(repo, getDefaultRefName()));
+  const defaultRefName = vsUtils.getDefaultRefName();
+  await parallelize(reposWithoutRef, (repo) => checkoutRepoRef(repo, defaultRefName));
 }
 
 // -----------------------------------------------------------------------------
@@ -62,12 +71,8 @@ function getReposWithRef(refName: string, context: GitContext): Repository[] {
 }
 
 function getReposWithoutRef(refName: string, context: GitContext): Repository[] {
-  const reposWithRef = new Set(context.refNamesMap.get(refName));
+  const reposWithRef = context.refNamesMap.get(refName) || new Set();
   return context.repos.filter((it) => !reposWithRef.has(it));
-}
-
-function getDefaultRefName(): string {
-  return (vsUtils.getConfiguration().defaultBranchName as string) || 'master';
 }
 
 // -----------------------------------------------------------------------------

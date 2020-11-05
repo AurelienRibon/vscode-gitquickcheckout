@@ -2,6 +2,7 @@
 
 import * as vscode from 'vscode';
 import * as gitUtils from './lib/git-utils';
+import * as vsUtils from './lib/vs-utils';
 import { Repository } from './types/git';
 
 export default { commandId: 'gitquickcheckout.checkoutAll', execute };
@@ -21,21 +22,26 @@ async function execute(): Promise<void> {
   };
 
   vscode.window.withProgress(progressOptions, async () => {
-    await gitUtils.checkoutRef(selectedItem.label, context);
-    vscode.window.setStatusBarMessage('Checkout done!', 3000);
+    const refName = getRefNameFromQuickPickLabel(selectedItem);
+    if (refName) {
+      await gitUtils.checkoutRef(refName, context);
+      vscode.window.setStatusBarMessage('Checkout done!', 3000);
+    }
   });
 }
 
 // -----------------------------------------------------------------------------
-// HELPERS
+// HELPERS: QUICKPICK
 // -----------------------------------------------------------------------------
 
 function mapRefsToQuickPickItems(context: gitUtils.GitContext): vscode.QuickPickItem[] {
-  const items: vscode.QuickPickItem[] = [];
+  const defaultRefName = vsUtils.getDefaultRefName();
+  const items: vscode.QuickPickItem[] = [{ label: `$(heart) ${defaultRefName}` }];
+
   for (const refName of context.refNames) {
     const repos = context.refNamesMap.get(refName);
     const description = repos && describeRepos(repos);
-    items.push({ label: refName, description });
+    items.push({ label: `$(git-merge) ${refName}`, description });
   }
 
   return items;
@@ -50,4 +56,9 @@ function getRepoName(repo: Repository): string {
   const { path } = repo.rootUri;
   const lastSepIndex = path.lastIndexOf('/');
   return lastSepIndex === -1 ? path : path.slice(lastSepIndex + 1);
+}
+
+function getRefNameFromQuickPickLabel(item: vscode.QuickPickItem): string | undefined {
+  const match = item.label.match(/^\$\(.+?\) (.+)$/);
+  return match ? match[1] : undefined;
 }
