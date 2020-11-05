@@ -20,6 +20,8 @@ export interface GitContext {
 // API
 // -----------------------------------------------------------------------------
 
+const HIDDEN_REF_NAMES = new Set(['master', 'HEAD']);
+
 export function listRefNames(): GitContext {
   const repos = getRepos();
   const refNamesMap = new Map() as RefMap;
@@ -83,6 +85,10 @@ function registerRefNames(repo: Repository, map: RefMap): void {
   const refNames = repo.state.refs.map(simplifyRefName).filter(isString);
 
   for (const refName of refNames) {
+    if (HIDDEN_REF_NAMES.has(refName)) {
+      continue;
+    }
+
     let bucket = map.get(refName);
     if (!bucket) {
       bucket = new Set();
