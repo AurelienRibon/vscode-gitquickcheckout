@@ -39,7 +39,7 @@
         "gitquickcheckout.defaultBranchName": {
           "type": "string",
           "default": "master",
-          "description": "Default branch to checkout in all folders for which selected branch is not available."
+          "description": "Default branch to checkout in all folders for which selected ref is not available."
         }
       }
     }

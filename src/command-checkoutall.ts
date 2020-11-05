@@ -21,7 +21,7 @@ async function execute(): Promise<void> {
     title: 'Checkout in progress...',
   };
 
-  vscode.window.withProgress(progressOptions, async () => {
+  await vscode.window.withProgress(progressOptions, async () => {
     const refName = getRefNameFromQuickPickLabel(selectedItem);
     if (refName) {
       await gitUtils.checkoutRef(refName, context);
@@ -35,7 +35,7 @@ async function execute(): Promise<void> {
 // -----------------------------------------------------------------------------
 
 function mapRefsToQuickPickItems(context: gitUtils.GitContext): vscode.QuickPickItem[] {
-  const defaultRefName = vsUtils.getDefaultRefName();
+  const defaultRefName = vsUtils.getOption('defaultBranchName');
   const items: vscode.QuickPickItem[] = [{ label: `$(heart) ${defaultRefName}` }];
 
   for (const refName of context.refNames) {

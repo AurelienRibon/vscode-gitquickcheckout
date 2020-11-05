@@ -36,7 +36,7 @@ export async function checkoutRef(refName: string, context: GitContext): Promise
   await parallelize(reposWithRef, (repo) => checkoutRepoRef(repo, refName));
 
   const reposWithoutRef = getReposWithoutRef(refName, context);
-  const defaultRefName = vsUtils.getDefaultRefName();
+  const defaultRefName = vsUtils.getOption('defaultBranchName');
   await parallelize(reposWithoutRef, (repo) => checkoutRepoRef(repo, defaultRefName));
 }
 
@@ -113,8 +113,8 @@ function simplifyRefName(ref?: Ref) {
 // HELPERS: SYSTEM
 // -----------------------------------------------------------------------------
 
-async function parallelize<T>(repositories: Repository[], fn: (repo: Repository) => Promise<T>): Promise<T[]> {
-  const promises = repositories.map(fn);
+async function parallelize<T>(repos: Repository[], fn: (repo: Repository) => Promise<T>): Promise<T[]> {
+  const promises = repos.map(fn);
   return Promise.all(promises);
 }
 
