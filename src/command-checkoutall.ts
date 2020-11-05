@@ -1,7 +1,6 @@
 'use strict';
 
 import * as vscode from 'vscode';
-import * as vsUtils from './lib/vs-utils';
 import * as gitUtils from './lib/git-utils';
 import { Repository } from './types/git';
 
@@ -12,11 +11,19 @@ async function execute(): Promise<void> {
   const quickPickItems = mapRefsToQuickPickItems(context);
   const placeHolder = 'Choose the ref to checkout in all workspace folders';
   const selectedItem = await vscode.window.showQuickPick(quickPickItems, { placeHolder });
-
-  if (selectedItem) {
-    await gitUtils.checkoutRef(selectedItem.label, context);
-    vsUtils.showBriefStatusBarMessage(`Workspace folders switched to ${selectedItem.label}.`);
+  if (!selectedItem) {
+    return;
   }
+
+  const progressOptions = {
+    location: vscode.ProgressLocation.Window,
+    title: 'Checkout in progress...',
+  };
+
+  vscode.window.withProgress(progressOptions, async () => {
+    await gitUtils.checkoutRef(selectedItem.label, context);
+    vscode.window.setStatusBarMessage('Checkout done!', 3000);
+  });
 }
 
 // -----------------------------------------------------------------------------
@@ -25,7 +32,6 @@ async function execute(): Promise<void> {
 
 function mapRefsToQuickPickItems(context: gitUtils.GitContext): vscode.QuickPickItem[] {
   const items: vscode.QuickPickItem[] = [];
-
   for (const refName of context.refNames) {
     const repos = context.refNamesMap.get(refName);
     const description = repos && describeRepos(repos);
