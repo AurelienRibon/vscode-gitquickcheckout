@@ -20,8 +20,6 @@ export interface GitContext {
 // API
 // -----------------------------------------------------------------------------
 
-const HIDDEN_REF_NAMES = new Set(['master', 'HEAD']);
-
 export function listRefNames(): GitContext {
   const repos = getRepos();
   const refNamesMap = new Map() as RefMap;
@@ -82,10 +80,11 @@ function getReposWithoutRef(refName: string, context: GitContext): Repository[] 
 // -----------------------------------------------------------------------------
 
 function registerRefNames(repo: Repository, map: RefMap): void {
+  const defaultRefName = vsUtils.getOption('defaultBranchName');
   const refNames = repo.state.refs.map(simplifyRefName).filter(isString);
 
   for (const refName of refNames) {
-    if (HIDDEN_REF_NAMES.has(refName)) {
+    if (refName === 'HEAD' || refName === defaultRefName) {
       continue;
     }
 
