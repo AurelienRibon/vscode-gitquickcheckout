@@ -38,6 +38,10 @@ export async function checkoutRef(refName: string, context: GitContext): Promise
   await parallelize(reposWithoutRef, (repo) => checkoutRepoRef(repo, defaultRefName));
 }
 
+export async function fetchRepos(context: GitContext): Promise<void> {
+  await parallelize(context.repos, (repo) => fetchRepo(repo));
+}
+
 // -----------------------------------------------------------------------------
 // HELPERS: GIT MUTATORS
 // -----------------------------------------------------------------------------
@@ -52,6 +56,15 @@ async function checkoutRepoRef(repo: Repository, refName: string): Promise<void>
   } catch (err) {
     const path = repo.rootUri.fsPath;
     console.error(`Failed to checkout ref in folder ${path}. ${err.message}`);
+  }
+}
+
+async function fetchRepo(repo: Repository): Promise<void> {
+  try {
+    await repo.fetch();
+  } catch (err) {
+    const path = repo.rootUri.fsPath;
+    console.error(`Failed to fetch repo in folder ${path}. ${err.message}`);
   }
 }
 

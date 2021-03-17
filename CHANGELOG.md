@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.5.0] - 2021-03-17
+### Added
+- Add command `fetchAll`, to fetch remotes for all repositories at once.
+
 ## [1.4.0] - 2020-11-05
 ### Added
 - Use vscode Git API instead of command line one, for better integration.

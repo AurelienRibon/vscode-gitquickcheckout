@@ -24,13 +24,18 @@
     "vscode": "^1.50.0"
   },
   "activationEvents": [
-    "onCommand:gitquickcheckout.checkoutAll"
+    "onCommand:gitquickcheckout.checkoutAll",
+    "onCommand:gitquickcheckout.fetchAll"
   ],
   "contributes": {
     "commands": [
       {
         "command": "gitquickcheckout.checkoutAll",
         "title": "Git Quick Checkout: Switch All Workspace Folders To Another Branch..."
+      },
+      {
+        "command": "gitquickcheckout.fetchAll",
+        "title": "Git Quick Checkout: Fetch All Workspace Folders Remotes"
       }
     ],
     "configuration": {

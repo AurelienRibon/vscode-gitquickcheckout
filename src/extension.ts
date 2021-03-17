@@ -2,8 +2,9 @@
 
 import * as vscode from 'vscode';
 import commandCheckoutAll from './command-checkoutall';
+import commandFetchAll from './command-fetchall';
 
-const COMMANDS = [commandCheckoutAll];
+const COMMANDS = [commandCheckoutAll, commandFetchAll];
 
 export function activate(context: vscode.ExtensionContext): void {
   for (const { commandId, execute } of COMMANDS) {
