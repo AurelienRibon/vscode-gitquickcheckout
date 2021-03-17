@@ -25,6 +25,7 @@
   },
   "activationEvents": [
     "onCommand:gitquickcheckout.checkoutAll",
+    "onCommand:gitquickcheckout.createBranches",
     "onCommand:gitquickcheckout.fetchAll"
   ],
   "contributes": {
@@ -32,6 +33,10 @@
       {
         "command": "gitquickcheckout.checkoutAll",
         "title": "Git Quick Checkout: Switch All Workspace Folders To Another Branch..."
+      },
+      {
+        "command": "gitquickcheckout.createBranches",
+        "title": "Git Quick Checkout: Create A New Branch In All Workspace Folders..."
       },
       {
         "command": "gitquickcheckout.fetchAll",

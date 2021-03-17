@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.6.0] - 2021-03-17
+### Added
+- Add command `createBranches`, to create a new branch in multiple repositories at once.
+
 ## [1.5.0] - 2021-03-17
 ### Added
 - Add command `fetchAll`, to fetch remotes for all repositories at once.

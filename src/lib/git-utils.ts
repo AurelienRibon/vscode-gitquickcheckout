@@ -48,6 +48,11 @@ export async function fetchRepos(context: GitContext): Promise<void> {
   await parallelize(context.repos, (repo) => fetchRepo(repo));
 }
 
+export async function createBranches(reposNames: string[], branchName: string, context: GitContext): Promise<void> {
+  const repos = context.repos.filter((repo) => reposNames.includes(getRepoName(repo)));
+  await parallelize(repos, (repo) => createBranch(repo, branchName));
+}
+
 // -----------------------------------------------------------------------------
 // HELPERS: GIT MUTATORS
 // -----------------------------------------------------------------------------
@@ -71,6 +76,15 @@ async function fetchRepo(repo: Repository): Promise<void> {
   } catch (err) {
     const path = repo.rootUri.fsPath;
     console.error(`Failed to fetch repo in folder ${path}. ${err.message}`);
+  }
+}
+
+async function createBranch(repo: Repository, branchName: string): Promise<void> {
+  try {
+    await repo.createBranch(branchName, true);
+  } catch (err) {
+    const path = repo.rootUri.fsPath;
+    console.error(`Failed to create branch '${branchName}' in folder ${path}. ${err.message}`);
   }
 }
 
