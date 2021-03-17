@@ -20,6 +20,12 @@ export interface GitContext {
 // API
 // -----------------------------------------------------------------------------
 
+export function getRepoName(repo: Repository): string {
+  const { path } = repo.rootUri;
+  const lastSepIndex = path.lastIndexOf('/');
+  return lastSepIndex === -1 ? path : path.slice(lastSepIndex + 1);
+}
+
 export function listRefNames(): GitContext {
   const repos = getRepos();
   const refNamesMap = new Map() as RefMap;

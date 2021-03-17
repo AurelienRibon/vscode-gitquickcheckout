@@ -48,14 +48,8 @@ function mapRefsToQuickPickItems(context: gitUtils.GitContext): vscode.QuickPick
 }
 
 function describeRepos(repos: Set<Repository>): string | undefined {
-  const names = Array.from(repos).map(getRepoName).sort();
+  const names = Array.from(repos).map(gitUtils.getRepoName).sort();
   return names.length > 0 ? '- ' + names.join(', ') : undefined;
-}
-
-function getRepoName(repo: Repository): string {
-  const { path } = repo.rootUri;
-  const lastSepIndex = path.lastIndexOf('/');
-  return lastSepIndex === -1 ? path : path.slice(lastSepIndex + 1);
 }
 
 function getRefNameFromQuickPickLabel(item: vscode.QuickPickItem): string | undefined {
