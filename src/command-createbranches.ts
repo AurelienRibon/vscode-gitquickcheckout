@@ -2,6 +2,7 @@
 
 import * as vscode from 'vscode';
 import * as gitUtils from './lib/git-utils';
+import * as vsUtils from './lib/vs-utils';
 
 export default { commandId: 'gitquickcheckout.createBranches', execute };
 
@@ -39,8 +40,10 @@ async function execute(): Promise<void> {
 // -----------------------------------------------------------------------------
 
 function guessNewBranchName(context: gitUtils.GitContext): string {
+  const defaultRefName = vsUtils.getOption('defaultBranchName');
+
   for (const repo of context.repos) {
-    if (repo.state.HEAD?.name && repo.state.HEAD.name !== 'master') {
+    if (repo.state.HEAD?.name && repo.state.HEAD.name !== defaultRefName) {
       return repo.state.HEAD.name;
     }
   }
