@@ -9,7 +9,8 @@ async function execute(): Promise<void> {
   const context = gitUtils.listRefNames();
 
   const prompt = 'What should be the new branch name?';
-  const branchName = await vscode.window.showInputBox({ prompt })
+  const branchNameProposal = guessNewBranchName(context);
+  const branchName = await vscode.window.showInputBox({ prompt, value: branchNameProposal });
   if (!branchName) {
     return;
   }
@@ -31,6 +32,20 @@ async function execute(): Promise<void> {
     await gitUtils.createBranches(reposNames, branchName, context);
     vscode.window.setStatusBarMessage('Branch creation done!', 3000);
   });
+}
+
+// -----------------------------------------------------------------------------
+// HELPERS: INITIAL NAME
+// -----------------------------------------------------------------------------
+
+function guessNewBranchName(context: gitUtils.GitContext): string {
+  for (const repo of context.repos) {
+    if (repo.state.HEAD?.name && repo.state.HEAD.name !== 'master') {
+      return repo.state.HEAD.name;
+    }
+  }
+
+  return '';
 }
 
 // -----------------------------------------------------------------------------
