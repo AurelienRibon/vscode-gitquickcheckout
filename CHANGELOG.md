@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.7.0] - 2021-12-08
+### Added
+- [command:createBranches] Pre-populate branch name if any repo is not on master.
+- [command:createBranches] Pre-pick repositories which contain changes.
+
 ## [1.6.0] - 2021-03-17
 ### Added
 - Add command `createBranches`, to create a new branch in multiple repositories at once.
