@@ -56,7 +56,10 @@ function mapReposToQuickPickItems(context: gitUtils.GitContext): vscode.QuickPic
   const items: vscode.QuickPickItem[] = [];
 
   for (const repo of context.repos) {
-    items.push({ label: `$(repo) ${gitUtils.getRepoName(repo)}` });
+    items.push({
+      label: `$(repo) ${gitUtils.getRepoName(repo)}`,
+      picked: repo.state.workingTreeChanges.length > 0,
+    });
   }
 
   return items;
