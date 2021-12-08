@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.7.1] - 2021-12-08
+### Fixed
+- [command:createBranches] Ensure use of `defaultBranchName` instead of hardcoded `master`.
+
 ## [1.7.0] - 2021-12-08
 ### Added
 - [command:createBranches] Pre-populate branch name if any repo is not on master.
