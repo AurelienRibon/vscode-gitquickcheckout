@@ -16,7 +16,7 @@ async function execute(): Promise<void> {
     return;
   }
 
-  const quickPickItems = mapReposToQuickPickItems(context);
+  const quickPickItems = mapReposToQuickPickItems(context, branchName);
   const placeHolder = 'Choose the repositories for the new branch.';
   const selectedItems = await vscode.window.showQuickPick(quickPickItems, { placeHolder, canPickMany: true });
   if (!selectedItems) {
@@ -55,13 +55,16 @@ function guessNewBranchName(context: gitUtils.GitContext): string {
 // HELPERS: QUICKPICK
 // -----------------------------------------------------------------------------
 
-function mapReposToQuickPickItems(context: gitUtils.GitContext): vscode.QuickPickItem[] {
+function mapReposToQuickPickItems(context: gitUtils.GitContext, branchName: string): vscode.QuickPickItem[] {
   const items: vscode.QuickPickItem[] = [];
 
   for (const repo of context.repos) {
+    const hasChanges = repo.state.workingTreeChanges.length > 0;
+    const hasBranch = context.refNamesMap.get(branchName)?.has(repo);
+
     items.push({
       label: `$(repo) ${gitUtils.getRepoName(repo)}`,
-      picked: repo.state.workingTreeChanges.length > 0,
+      picked: hasChanges && !hasBranch,
     });
   }
 

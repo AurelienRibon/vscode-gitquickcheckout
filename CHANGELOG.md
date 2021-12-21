@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.7.2] - 2021-12-21
+### Fixed
+- [command:createBranches] Remove pre-selection of repositories already having the branch.
+
 ## [1.7.1] - 2021-12-08
 ### Fixed
 - [command:createBranches] Ensure use of `defaultBranchName` instead of hardcoded `master`.
