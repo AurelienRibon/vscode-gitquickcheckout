@@ -40,10 +40,11 @@ async function execute(): Promise<void> {
 // -----------------------------------------------------------------------------
 
 function guessNewBranchName(context: gitUtils.GitContext): string {
-  const defaultRefName = vsUtils.getOption('defaultBranchName');
+  const defaultRefNames = vsUtils.getOption('defaultBranchNames');
+  const defaultRefNamesSet = new Set(defaultRefNames);
 
   for (const repo of context.repos) {
-    if (repo.state.HEAD?.name && repo.state.HEAD.name !== defaultRefName) {
+    if (repo.state.HEAD?.name && !defaultRefNamesSet.has(repo.state.HEAD.name)) {
       return repo.state.HEAD.name;
     }
   }

@@ -46,10 +46,10 @@
     "configuration": {
       "title": "Git Quick Checkout",
       "properties": {
-        "gitquickcheckout.defaultBranchName": {
-          "type": "string",
-          "default": "master",
-          "description": "Default branch to checkout in all folders for which selected ref is not available."
+        "gitquickcheckout.defaultBranchNames": {
+          "type": "array",
+          "default": ["main", "master"],
+          "description": "Default branches to checkout in all folders for which selected ref is not available."
         }
       }
     }

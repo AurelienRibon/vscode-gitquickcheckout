@@ -40,8 +40,16 @@ export async function checkoutRef(refName: string, context: GitContext): Promise
   await parallelize(reposWithRef, (repo) => checkoutRepoRef(repo, refName));
 
   const reposWithoutRef = getReposWithoutRef(refName, context);
-  const defaultRefName = vsUtils.getOption('defaultBranchName');
-  await parallelize(reposWithoutRef, (repo) => checkoutRepoRef(repo, defaultRefName));
+  await checkoutReposDefaultRef(context, reposWithoutRef);
+}
+
+export async function checkoutDefaultRef(context: GitContext): Promise<void> {
+  const defaultRefNames = vsUtils.getOption('defaultBranchNames');
+
+  for (const refName of defaultRefNames) {
+    const reposWithRef = getReposWithRef(refName, context);
+    await parallelize(reposWithRef, (repo) => checkoutRepoRef(repo, refName));
+  }
 }
 
 export async function fetchRepos(context: GitContext): Promise<void> {
@@ -67,6 +75,16 @@ async function checkoutRepoRef(repo: Repository, refName: string): Promise<void>
   } catch (err) {
     const path = repo.rootUri.fsPath;
     console.error(`Failed to checkout ref in folder ${path}. ${err.message}`);
+  }
+}
+
+async function checkoutReposDefaultRef(context: GitContext, repos: Repository[]): Promise<void> {
+  const defaultRefNames = vsUtils.getOption('defaultBranchNames');
+
+  for (const refName of defaultRefNames) {
+    const reposWithRef = getReposWithRef(refName, context);
+    const reposToCheckout = intersectRepos(repos, reposWithRef);
+    await parallelize(reposToCheckout, (repo) => checkoutRepoRef(repo, refName));
   }
 }
 
@@ -108,16 +126,29 @@ function getReposWithoutRef(refName: string, context: GitContext): Repository[] 
   return context.repos.filter((it) => !reposWithRef.has(it));
 }
 
+function intersectRepos(repos1: Repository[], repos2: Repository[]): Repository[] {
+  const intersection = [] as Repository[];
+  const repos2NameSet = new Set(repos2.map(getRepoName));
+
+  for (const repo1 of repos1) {
+    const repo1Name = getRepoName(repo1);
+    if (repos2NameSet.has(repo1Name)) {
+      intersection.push(repo1);
+    }
+  }
+
+  return intersection;
+}
+
 // -----------------------------------------------------------------------------
 // HELPERS: REF MAPPING
 // -----------------------------------------------------------------------------
 
 function registerRefNames(repo: Repository, map: RefMap): void {
-  const defaultRefName = vsUtils.getOption('defaultBranchName');
   const refNames = repo.state.refs.map(simplifyRefName).filter(isString);
 
   for (const refName of refNames) {
-    if (refName === 'HEAD' || refName === defaultRefName) {
+    if (refName === 'HEAD') {
       continue;
     }
 

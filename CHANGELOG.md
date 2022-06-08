@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.8.0] - 2022-06-08
+### Added
+- Add support for multiple default branches in the workspace (main, master).
+
 ## [1.7.2] - 2021-12-21
 ### Fixed
 - [command:createBranches] Remove pre-selection of repositories already having the branch.

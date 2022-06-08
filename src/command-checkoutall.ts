@@ -7,6 +7,8 @@ import { Repository } from './types/git';
 
 export default { commandId: 'gitquickcheckout.checkoutAll', execute };
 
+const DEFAULT_BRANCH = '<< DEFAULT >>';
+
 async function execute(): Promise<void> {
   const context = gitUtils.listRefNames();
   const quickPickItems = mapRefsToQuickPickItems(context);
@@ -23,7 +25,11 @@ async function execute(): Promise<void> {
 
   await vscode.window.withProgress(progressOptions, async () => {
     const refName = getRefNameFromQuickPickLabel(selectedItem);
-    if (refName) {
+
+    if (refName === DEFAULT_BRANCH) {
+      await gitUtils.checkoutDefaultRef(context);
+      vscode.window.setStatusBarMessage('Checkout done!', 3000);
+    } else if (refName) {
       await gitUtils.checkoutRef(refName, context);
       vscode.window.setStatusBarMessage('Checkout done!', 3000);
     }
@@ -35,8 +41,8 @@ async function execute(): Promise<void> {
 // -----------------------------------------------------------------------------
 
 function mapRefsToQuickPickItems(context: gitUtils.GitContext): vscode.QuickPickItem[] {
-  const defaultRefName = vsUtils.getOption('defaultBranchName');
-  const items: vscode.QuickPickItem[] = [{ label: `$(heart) ${defaultRefName}` }];
+  const defaultRefNames = vsUtils.getOption('defaultBranchNames');
+  const items: vscode.QuickPickItem[] = [{ label: `$(heart) ${defaultRefNames.join(', ')}` }];
 
   for (const refName of context.refNames) {
     const repos = context.refNamesMap.get(refName);
@@ -53,6 +59,10 @@ function describeRepos(repos: Set<Repository>): string | undefined {
 }
 
 function getRefNameFromQuickPickLabel(item: vscode.QuickPickItem): string | undefined {
+  if (item.label.startsWith('$(heart)')) {
+    return DEFAULT_BRANCH;
+  }
+
   const match = item.label.match(/^\$\(.+?\) (.+)$/);
   return match ? match[1] : undefined;
 }
