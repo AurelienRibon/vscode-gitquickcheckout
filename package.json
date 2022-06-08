@@ -1,6 +1,6 @@
 {
   "name": "gitquickcheckout",
-  "version": "1.7.2",
+  "version": "1.8.0",
   "license": "MIT",
   "author": "Aurelien Ribon <aurelien.ribon@gmail.com> (http://www.aurelienribon.com)",
   "main": "./out/src/extension.js",
@@ -48,7 +48,10 @@
       "properties": {
         "gitquickcheckout.defaultBranchNames": {
           "type": "array",
-          "default": ["main", "master"],
+          "default": [
+            "main",
+            "master"
+          ],
           "description": "Default branches to checkout in all folders for which selected ref is not available."
         }
       }
