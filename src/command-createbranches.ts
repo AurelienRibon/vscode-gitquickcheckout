@@ -7,7 +7,7 @@ import * as vsUtils from './lib/vs-utils';
 export default { commandId: 'gitquickcheckout.createBranches', execute };
 
 async function execute(): Promise<void> {
-  const context = gitUtils.listRefNames();
+  const context = await gitUtils.listRefNames();
 
   const prompt = 'What should be the new branch name?';
   const branchNameProposal = guessNewBranchName(context);

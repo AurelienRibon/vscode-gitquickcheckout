@@ -3,7 +3,14 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { Event, Uri } from 'vscode';
+import { CancellationToken, Event, Uri } from 'vscode';
+
+export interface RefQuery {
+	readonly contains?: string;
+	readonly count?: number;
+	readonly pattern?: string;
+	readonly sort?: 'alphabetically' | 'committerdate';
+}
 
 export interface Git {
 	readonly path: string;
@@ -159,6 +166,9 @@ export interface Repository {
 	deleteBranch(name: string, force?: boolean): Promise<void>;
 	getBranch(name: string): Promise<Branch>;
 	setBranchUpstream(name: string, upstream: string): Promise<void>;
+
+	getBranch(name: string): Promise<Branch>;
+	getRefs(query: RefQuery, cancellationToken?: CancellationToken): Promise<Ref[]>
 
 	getMergeBase(ref1: string, ref2: string): Promise<string>;
 
