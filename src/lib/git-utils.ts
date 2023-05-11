@@ -26,10 +26,13 @@ export function getRepoName(repo: Repository): string {
   return lastSepIndex === -1 ? path : path.slice(lastSepIndex + 1);
 }
 
-export function listRefNames(): GitContext {
+export async function listRefNames(): Promise<GitContext> {
   const repos = getRepos();
   const refNamesMap = new Map() as RefMap;
-  repos.forEach((it) => registerRefNames(it, refNamesMap));
+  
+  for (const repo of repos) {
+    await registerRefNames(repo, refNamesMap);
+  }
 
   const refNames = [...refNamesMap.keys()].sort();
   return { repos, refNames, refNamesMap };
@@ -74,7 +77,8 @@ async function checkoutRepoRef(repo: Repository, refName: string): Promise<void>
     await repo.checkout(refName);
   } catch (err) {
     const path = repo.rootUri.fsPath;
-    console.error(`Failed to checkout ref in folder ${path}. ${err.message}`);
+    const message = err instanceof Error ? err.message : "Unknown error."
+    console.error(`Failed to checkout ref in folder ${path}. ${message}`);
   }
 }
 
@@ -93,7 +97,8 @@ async function fetchRepo(repo: Repository): Promise<void> {
     await repo.fetch();
   } catch (err) {
     const path = repo.rootUri.fsPath;
-    console.error(`Failed to fetch repo in folder ${path}. ${err.message}`);
+    const message = err instanceof Error ? err.message : "Unknown error."
+    console.error(`Failed to fetch repo in folder ${path}. ${message}`);
   }
 }
 
@@ -102,7 +107,8 @@ async function createBranch(repo: Repository, branchName: string): Promise<void>
     await repo.createBranch(branchName, true);
   } catch (err) {
     const path = repo.rootUri.fsPath;
-    console.error(`Failed to create branch '${branchName}' in folder ${path}. ${err.message}`);
+    const message = err instanceof Error ? err.message : "Unknown error."
+    console.error(`Failed to create branch '${branchName}' in folder ${path}. ${message}`);
   }
 }
 
@@ -144,8 +150,9 @@ function intersectRepos(repos1: Repository[], repos2: Repository[]): Repository[
 // HELPERS: REF MAPPING
 // -----------------------------------------------------------------------------
 
-function registerRefNames(repo: Repository, map: RefMap): void {
-  const refNames = repo.state.refs.map(simplifyRefName).filter(isString);
+async function registerRefNames(repo: Repository, map: RefMap): Promise<void> {
+  const refs = await getRefs(repo);
+  const refNames = refs.map(simplifyRefName).filter(isString);
 
   for (const refName of refNames) {
     if (refName === 'HEAD') {
@@ -160,6 +167,16 @@ function registerRefNames(repo: Repository, map: RefMap): void {
 
     bucket.add(repo);
   }
+}
+
+async function getRefs(repository: Repository): Promise<Ref[]> {
+  // `repository.getRefs` is not available on older versions and we should 
+  // just use `repository.state.refs` on those versions.
+  if (typeof repository.getRefs !== 'function') {
+    return repository.state.refs;
+  }
+
+  return await repository.getRefs({});
 }
 
 function simplifyRefName(ref?: Ref) {

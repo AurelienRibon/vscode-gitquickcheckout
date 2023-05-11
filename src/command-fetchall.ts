@@ -6,7 +6,7 @@ import * as gitUtils from './lib/git-utils';
 export default { commandId: 'gitquickcheckout.fetchAll', execute };
 
 async function execute(): Promise<void> {
-  const context = gitUtils.listRefNames();
+  const context = await gitUtils.listRefNames();
 
   const progressOptions = {
     location: vscode.ProgressLocation.Window,

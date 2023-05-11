@@ -10,7 +10,7 @@ export default { commandId: 'gitquickcheckout.checkoutAll', execute };
 const DEFAULT_BRANCH = '<< DEFAULT >>';
 
 async function execute(): Promise<void> {
-  const context = gitUtils.listRefNames();
+  const context = await gitUtils.listRefNames();
   const quickPickItems = mapRefsToQuickPickItems(context);
   const placeHolder = 'Choose the ref to checkout in all workspace folders';
   const selectedItem = await vscode.window.showQuickPick(quickPickItems, { placeHolder });
